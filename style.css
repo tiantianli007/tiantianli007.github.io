@@ -1,0 +1,47 @@
+.select{
+	width:200px;
+}
+
+md-card {
+	background-color:white;
+	opacity:0.9;
+	margin-left:200px;
+	margin-right:200px;
+	margin-top: 50px;
+	/*min-height: 500px;*/
+	padding:10px;
+	layout:row;
+}
+
+.title {
+	color:white;
+	font-size: 50px;
+}
+
+.menu {
+	justify-content: space-around;
+}
+
+.front {
+	display: inline-block;
+    *display: inline; /* For IE7 */
+    width: 31%;
+    text-align: center;
+    justify-content: space-around;
+    margin-top: 30px;
+    margin-bottom:30px;
+    height:100px;
+}
+
+.round {
+  border-radius: 50%;
+  float: right;
+}
+
+a {
+	text-decoration: none;
+}
+
+#div-id-name {
+	margin:100px;
+}
