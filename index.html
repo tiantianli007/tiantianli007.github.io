@@ -1,14 +1,426 @@
+<!doctype html>
 <html>
-<head>
-<title>Tiantian Li</title>
-</head>
-<body>
-<h1 style="color: green;">
-Hi, I'm Tiantian.
-</h1>
+	<head>
+		<title>Load Calculator</title>
+	</head>
 
-<p>
-I am currently looking for Spring 2020 Internships. Please contact me if interested!
-</p>
-</body>
+	<body ng-app="app" my-background-image="https://img1.wsimg.com/isteam/stock/780/:/cr=t:0%25,l:0%25,w:100%25,h:72.22%25/rs=w:1076,h:538,cg:true">
+		<h1 class="title">Load Calculator</h1>
+		<hr>
+		<div ng-controller="ctrl">
+
+			<md-card>
+				<md-input-container ng-show="selection==false" class="menu">
+					<md-button class="md-raised front" ng-click="change('Single Dwelling')">Single Dwelling</md-button>
+					<md-button class="md-raised front" ng-click="change('Apartment')">Apartment</md-button>
+					<md-button class="md-raised front" ng-click="change('Townhouse')">Townhouse</md-button>
+					<md-button class="md-raised front" ng-click="change('Other')">Other</md-button>
+		        </md-input-container>
+
+				<div ng-show="selection">
+					<h1>{{choice}}</h1>
+					<md-input-container>
+			        	<label>voltage</label>
+			        	<md-select ng-model="voltage" class="select">
+			            	<md-option ng-repeat="v in voltages" value="{{v.val}}">{{v.type}}</md-option>
+			        	</md-select>
+			        </md-input-container>
+
+			        <md-input-container ng-hide="choice=='Single Dwelling'">
+			        	<label>Phase</label>
+				        <md-select ng-model="face">
+				            <md-option ng-repeat="v in faces" value="{{v.val}}">{{v.type}}</md-option>
+				        </md-select>
+				    </md-input-container>
+
+				    <md-button class="md-raised round md-primary" ng-click="back()" float="right">&laquo; back</md-button>
+			        <br>
+			        <table ng-show="choice=='Other'">
+			        	<tr>
+			        		<md-input-container ng-show="choice=='Other'">
+					        	<label>Occupancy</label>
+						        <md-select ng-model="occupancy">
+						            <md-option ng-repeat="v in occupancies" value="{{v}}">{{v}}</md-option>
+						        </md-select>
+						    </md-input-container>
+						    <md-radio-group ng-model="other_factor" layout="row" ng-show="choice=='Other'">
+						    	<md-radio-button value="Service" class="md-primary">Service</md-radio-button>
+						      	<md-radio-button value="Feeder">Feeder</md-radio-button>
+						    </md-radio-group>
+			        	</tr>
+			        	<tr>
+			        		<td>Area of Building</td>
+			        		<td><input type="number" ng-model="area"></td>
+			        		<td>m^2</td>
+			        	</tr>
+			        	<tr>
+			        		<td>Electric space-heating power load</td>
+			        		<td><input type="number" ng-model="heating"></td>
+			        		<td>kW</td>
+			        	</tr>
+			        	<tr>
+			        		<td>air-conditioning power load</td>
+			        		<td><input type="number" ng-model="cooling"></td>
+			        		<td>kW</td>
+			        	</tr>
+			        	<tr>
+			        		<td style="min-width: 300px">Kitchen Load</td>
+			        		<td><input type="number" ng-model="kitchen"></td>
+			        		<td>kW</td>
+			        	</tr>
+			        	<tr>
+			        		<td>Elevator Loads</td>
+			        		<td><input type="number" ng-model="elevator"></td>
+			        		<td>kW</td>
+			        	</tr>
+			        	<tr>
+			        		<td>Other Loads</td>
+			        		<td><input type="number" ng-model="additional"></td>
+			        		<td>kW</td>
+			        	</tr>
+			        	<tr>
+			        		<td>number of automobile spaces or stalls per feeder</td>
+			        		<td><input type="number" ng-model="space_units"></td>
+			        	</tr>
+			        	<tr>
+			        		<td>Maximum load per space or stall</td>
+			        		<td><input type="number" ng-model="space_load"></td>
+			        		<td>kW</td>
+			        	</tr>
+			        </table>
+
+			        <table ng-hide="choice=='Other'">
+			        	<tr>
+			        		<td style="min-width: 300px">Area of house/unit</td>
+			        		<td><input type="number" ng-model="area"></td>
+			        		<td>m^2</td>
+			        	</tr>
+			        	<tr>
+			        		<td>Electric space-heating power load</td>
+			        		<td><input type="number" ng-model="heating"></td>
+			        		<td>kW</td>
+			        	</tr>
+			        	<tr>
+			        		<td>air-conditioning power load</td>
+			        		<td><input type="number" ng-model="cooling"></td>
+			        		<td>kW</td>
+			        	</tr>
+			        	<tr>
+			        		<td>Electric Range<input type="checkbox" ng-model="range"></td>
+			        	</tr>
+			        	<tr ng-show="range">
+			        		<td>leave as zero if under 12kW </td>
+			        		<td><input type="number" ng-model="range_power"></td>
+			        		<td>kW</td>
+			        	</tr>
+			        	<tr>
+			        		<td>Electric tankless water heaters, electric water heaters for steamers, swimming pools, hot tubs, spas</td>
+			        		<td><input type="number" ng-model="water_heater"></td>
+			        		<td>kW</td>
+			        	</tr>
+			        	<tr>
+			        		<td>Additional loads provided for that have  a rating in excess of 1500 W</td>
+			        		<td><input type="number" ng-model="additional"></td>
+			        		<td>kW</td>
+			        	</tr>
+			        	<tr ng-hide="choice=='Apartment'">
+			        		<td>Electric vehicle supply equipment loads (Within unit)</td>
+			        		<td><input type="number" ng-model="electric_vehicle"></td>
+			        		<td>kW</td>
+			        	</tr>
+						<tr ng-hide="choice=='Single Dwelling'">
+			        		<td>number of apartment/townhouse units</td>
+			        		<td><input type="number" ng-model="apt_units" /></td>
+			        	</tr>
+			        	<tr ng-hide="choice=='Single Dwelling'">
+			        		<td>number of automobile spaces or stalls per feeder</td>
+			        		<td><input type="number" ng-model="space_units"></td>
+			        	</tr>
+			        	<tr ng-hide="choice=='Single Dwelling'">
+			        		<td>Maximum load per space or stall</td>
+			        		<td><input type="number" ng-model="space_load"></td>
+			        		<td>kW</td>
+			        	</tr>
+			        	<tr ng-hide="choice=='Single Dwelling'">
+			        		<td>lighting, heating and power loads not located in dwelling apt_units</td>
+			        		<td><input type="number" ng-model="external_power"></td>
+			        		<td>kW</td>
+			        	</tr>
+			        </table>
+
+			        <md-button class="md-raised md-warn" ng-click="calculate()">calculate</md-button>
+			        <md-button class="md-raised md-warn" onclick="javascript:printlayer('other_div')">print</md-button>
+			        <md-button ng-show="calculated" class="md-raised md-warn" ng-click="export()">download</md-button>
+
+
+		            <div ng-show="calculated && choice=='Single Dwelling'">
+		            	<p>Power: {{total | number : 1}}kW</p>
+		            	<p>Current: {{total/voltage | number : 1}}A</p>
+		            </div>
+
+		            <div ng-show="calculated && choice=='Apartment'">
+		            	<p>current per suite: {{total | number : 1}}A</p>
+		            	<p>current for all suites: {{suite_load | number : 1}}A</p>
+		            	<p>power for entire apartment: {{apt_load | number:1}}kW</p>
+		            	<p>current for entire apartment: {{apt_amp | number:1}}A</p>
+		            </div>
+
+		            <div ng-show="calculated && choice=='Townhouse'">
+		            	<p>current per suite: {{total | number : 1}}A</p>
+		            	<p>current for all suites: {{suite_load | number : 1}}A</p>
+		            	<p>power for entire Townhouse: {{apt_load | number:1}}kW</p>
+		            	<p>current for entire Townhouse: {{apt_amp | number:1}}A</p>
+		            </div>
+
+		            <div ng-show="calculated && choice=='Other'">
+		            	<p>power for entire Building: {{apt_load | number:1}}kW</p>
+		            	<p>current for entire Building: {{apt_amp | number:1}}A</p>
+		            </div>
+
+			        <table>
+			        	<tr>
+			        		<td>Address of Client: </td>
+			        		<td><input ng-model="address"></td>
+			        	</tr>
+			        	<tr>
+			        		<td>Building: </td>
+			        		<td><input ng-model="building"></td>
+			        	</tr>
+			        	<tr>
+			        		<td>additional points: </td>
+			        		<td><input ng-model="details"></td>
+			        	</tr>
+			        </table>
+
+				</div>
+			</md-card>
+
+			<div id="other_div" hidden="true">
+				<h1>JRL Engineering Inc.</h1>
+				<hr>
+				<p id="date"></p>
+
+				<p>ESA Plan Review<br>400 Sheldon Drive, Unit 1, Cambridge, ON, N1T 2H9</p>
+
+				<p>Attention: Plan Reviewer</p>
+				<div layout="row">
+					<p><b>RE:</b></p>
+					<p><b>{{address}}<br>PROJECT: #1507</b></p>
+				</div>
+				<p>We submit in attachment, for your review, a complete set of electrical plans, and load calculations for the above project.<br><br>The following is the project general information and load calculation:</p>
+				<ol>
+					<li>This is {{building}} project comprised of:</li>
+						<ul>
+							<li>{{details}}</li>
+						</ul>
+					<li>Power loads calculation (demand load):
+						<ul>
+							<li>Basic Load: {{occ_load()}}KW</li>
+							<li ng-show="{{heating>cooling}}">Heating Loads (Larger than A/C loads): {{heating}}KW</li>
+							<li ng-show="{{heating<cooling}}">A/C Loads (Larger than heating loads): {{cooling}}KW</li>
+							<li>Kitchen: {{kitchen}}KW</li>
+							<li>Elevator: {{elevator}}KW</li>
+							<li>Other Loads: {{additional}}KW</li>
+							<li><b>Total demand loads: {{total_load()}}KW</b></li>
+						</ul>
+					</li>
+					<li>Calculated Service:<br>power for entire Building: {{apt_load | number:1}}kW<br>current for entire Building: {{apt_amp | number:1}}A</li>
+					<li>Design Service:</li>
+					<br>
+				</ol>
+				<p>Yours truly,<br><br><b>JRL Engineering</b></p>
+				<img height="100px" src="https://lh3.googleusercontent.com/xMtSaZUNgb16rAOyGJ3ce-cN4UozLL1Ti1dsJbe6Spm9FzyIe_3i-L0ZMpgaM1DOYh0-K0vmaAUvu9y-WUTDae4JeNcX4VsgyK6MZuJ0vtZlpgR-4SzWLlkLARAm7BR0xlBEoHRU9YSItDPiWkoEdJ3XU1TtSSq_BpbZ7epNmdp2mffYduoFCs3mfNcNSPFDXtpOWelUo_Fl7ewScJUW7tun-bcz9P4Pz_Ob8Lfxb1QFxgQ0xZBjzZDBbI0uunWsQ7ycjcGMxBD_Dep2CLUWS16D4LN-bJkyZdlPSWIsdcX6qYzHH0oOXwQKkJGMh0AWZymbMZ4eC0fNjPBAsdlJn7MCYqr8rs5VJNhDTriG4XW5xG0a0EzC6xc_39bb_jPNnuuOfuFOpKldIhcIPF1MQK8Zz3Tl4bub46Asqe-KylgvPTukz0ygmxmcjFGvmabFoxtM8UqPbuRWj_IOFXhQFR5-RxFqEhBrgYTwjl_wUsWXz0XJqyUhzsvSdhWsqgijIXIivYzZDorqv7Z8sEqmEhnCH-U7JQC2XCqkFQMwysVBLiAYQpDBhQzBmDpt8-iZsgHCNPmPiBGrEkhEIE9U2MYsPOOLJOXIr2BqfJKAGxn7OcAbMiHtvZNBcD5VdrH8m-Zt6nr-bwyMQslOATeJA1uq18dgPBHJgUKDXkcFLR-79wCJjDCRrIxTYnIT=w313-h165-no?authuser=0">
+				<p>Jian Min Li, P. Eng.</p>
+				<footer>
+					<p>131 Cooperage Cres. Richmond Hill, ON, L4C 9L8	Tel: 647-537-6299 E-mail: jianminli2015@gmail.com</p>
+				</footer>
+			</div>
+
+			<div id="single_dwelling_div" hidden="true">
+				<h1>JRL Engineering Inc.</h1>
+				<hr>
+				<p id="date"></p>
+
+				<p>ESA Plan Review<br>400 Sheldon Drive, Unit 1, Cambridge, ON, N1T 2H9</p>
+
+				<p>Attention: Plan Reviewer</p>
+				<div layout="row">
+					<p><b>RE:</b></p>
+					<p><b>{{address}}<br>PROJECT: #1507</b></p>
+				</div>
+				<p>We submit in attachment, for your review, a complete set of electrical plans, and load calculations for the above project.<br><br>The following is the project general information and load calculation:</p>
+				<ol>
+					<li>This is {{building}} project comprised of:</li>
+						<ul>
+							<li>{{details}}</li>
+						</ul>
+					<li>Power loads calculation (demand load):
+						<ul>
+							<li>Area Load: {{area_load()}}KW</li>
+							<li ng-show="{{heating>cooling}}">Heating Loads (Larger than A/C loads): {{heating}}KW</li>
+							<li ng-show="{{heating<cooling}}">A/C Loads (Larger than heating loads): {{cooling}}KW</li>
+							<li ng-show="range">Range Load: {{range_power}}KW</li>
+							<li>Electric tankless water heaters, electric water heaters for steamers, swimming pools, hot tubs, spas Load: {{water_heater}}KW</li>
+							<li>Electric Vehicle Loads: {{electric_vehicle}}KW</li>
+							<li>Additional Loads: {{additional}}KW</li>
+						</ul>
+					</li>
+					<li>Calculated Service:<br>Power: {{total | number : 1}}kW<br>Current: {{total/voltage | number : 1}}A</li>
+					<li>Design Service:</li>
+					<br>
+				</ol>
+				<p>Yours truly,<br><br><b>JRL Engineering</b></p>
+				<img height="100px" src="https://lh3.googleusercontent.com/xMtSaZUNgb16rAOyGJ3ce-cN4UozLL1Ti1dsJbe6Spm9FzyIe_3i-L0ZMpgaM1DOYh0-K0vmaAUvu9y-WUTDae4JeNcX4VsgyK6MZuJ0vtZlpgR-4SzWLlkLARAm7BR0xlBEoHRU9YSItDPiWkoEdJ3XU1TtSSq_BpbZ7epNmdp2mffYduoFCs3mfNcNSPFDXtpOWelUo_Fl7ewScJUW7tun-bcz9P4Pz_Ob8Lfxb1QFxgQ0xZBjzZDBbI0uunWsQ7ycjcGMxBD_Dep2CLUWS16D4LN-bJkyZdlPSWIsdcX6qYzHH0oOXwQKkJGMh0AWZymbMZ4eC0fNjPBAsdlJn7MCYqr8rs5VJNhDTriG4XW5xG0a0EzC6xc_39bb_jPNnuuOfuFOpKldIhcIPF1MQK8Zz3Tl4bub46Asqe-KylgvPTukz0ygmxmcjFGvmabFoxtM8UqPbuRWj_IOFXhQFR5-RxFqEhBrgYTwjl_wUsWXz0XJqyUhzsvSdhWsqgijIXIivYzZDorqv7Z8sEqmEhnCH-U7JQC2XCqkFQMwysVBLiAYQpDBhQzBmDpt8-iZsgHCNPmPiBGrEkhEIE9U2MYsPOOLJOXIr2BqfJKAGxn7OcAbMiHtvZNBcD5VdrH8m-Zt6nr-bwyMQslOATeJA1uq18dgPBHJgUKDXkcFLR-79wCJjDCRrIxTYnIT=w313-h165-no?authuser=0">
+				<p>Jian Min Li, P. Eng.</p>
+				<footer>
+					<p>131 Cooperage Cres. Richmond Hill, ON, L4C 9L8	Tel: 647-537-6299 E-mail: jianminli2015@gmail.com</p>
+				</footer>
+			</div>
+
+			<div id="apt_div" hidden="true">
+				<h1>JRL Engineering Inc.</h1>
+				<hr>
+				<p id="date"></p>
+
+				<p>ESA Plan Review<br>400 Sheldon Drive, Unit 1, Cambridge, ON, N1T 2H9</p>
+
+				<p>Attention: Plan Reviewer</p>
+				<div layout="row">
+					<p><b>RE:</b></p>
+					<p><b>{{address}}<br>PROJECT: #1507</b></p>
+				</div>
+				<p>We submit in attachment, for your review, a complete set of electrical plans, and load calculations for the above project.<br><br>The following is the project general information and load calculation:</p>
+				<ol>
+					<li>This is {{building}} project comprised of:</li>
+						<ul>
+							<li>{{apt_units}} Units</li>
+							<li>{{details}}</li>
+						</ul>
+					<li>Power loads calculation (demand load):
+						<ul>
+							<li>Area Load: {{area_load()}}KW</li>
+							<li ng-show="{{heating>cooling}}">Heating Loads (Larger than A/C loads): {{heating}}KW</li>
+							<li ng-show="{{heating<cooling}}">A/C Loads (Larger than heating loads): {{cooling}}KW</li>
+							<li ng-show="range">Range Load: {{range_power}}KW</li>
+							<li>Electric tankless water heaters, electric water heaters for steamers, swimming pools, hot tubs, spas Load: {{water_heater}}KW</li>
+							<li>Additional Loads: {{additional}}KW</li>
+							<li>Electrical Vehicle Loads:<br>{{space_units}} units x {{space_load}}kW = {{space_units*space_load}}</li>
+							<li>External Loads: {{external_power}}KW</li>
+						</ul>
+					</li>
+					<li>Calculated Service:<br>power for entire apartment: {{apt_load | number:1}}kW<br>current for entire apartment: {{apt_amp | number:1}}A</li>
+					<li>Design Service:</li>
+					<br>
+				</ol>
+				<p>Yours truly,<br><br><b>JRL Engineering</b></p>
+				<img height="100px" src="https://lh3.googleusercontent.com/xMtSaZUNgb16rAOyGJ3ce-cN4UozLL1Ti1dsJbe6Spm9FzyIe_3i-L0ZMpgaM1DOYh0-K0vmaAUvu9y-WUTDae4JeNcX4VsgyK6MZuJ0vtZlpgR-4SzWLlkLARAm7BR0xlBEoHRU9YSItDPiWkoEdJ3XU1TtSSq_BpbZ7epNmdp2mffYduoFCs3mfNcNSPFDXtpOWelUo_Fl7ewScJUW7tun-bcz9P4Pz_Ob8Lfxb1QFxgQ0xZBjzZDBbI0uunWsQ7ycjcGMxBD_Dep2CLUWS16D4LN-bJkyZdlPSWIsdcX6qYzHH0oOXwQKkJGMh0AWZymbMZ4eC0fNjPBAsdlJn7MCYqr8rs5VJNhDTriG4XW5xG0a0EzC6xc_39bb_jPNnuuOfuFOpKldIhcIPF1MQK8Zz3Tl4bub46Asqe-KylgvPTukz0ygmxmcjFGvmabFoxtM8UqPbuRWj_IOFXhQFR5-RxFqEhBrgYTwjl_wUsWXz0XJqyUhzsvSdhWsqgijIXIivYzZDorqv7Z8sEqmEhnCH-U7JQC2XCqkFQMwysVBLiAYQpDBhQzBmDpt8-iZsgHCNPmPiBGrEkhEIE9U2MYsPOOLJOXIr2BqfJKAGxn7OcAbMiHtvZNBcD5VdrH8m-Zt6nr-bwyMQslOATeJA1uq18dgPBHJgUKDXkcFLR-79wCJjDCRrIxTYnIT=w313-h165-no?authuser=0">
+				<p>Jian Min Li, P. Eng.</p>
+				<footer>
+					<p>131 Cooperage Cres. Richmond Hill, ON, L4C 9L8	Tel: 647-537-6299 E-mail: jianminli2015@gmail.com</p>
+				</footer>
+			</div>
+
+			<div id="townhouse_div" hidden="true">
+				<h1>JRL Engineering Inc.</h1>
+				<hr>
+				<p id="date"></p>
+
+				<p>ESA Plan Review<br>400 Sheldon Drive, Unit 1, Cambridge, ON, N1T 2H9</p>
+
+				<p>Attention: Plan Reviewer</p>
+				<div layout="row">
+					<p><b>RE:</b></p>
+					<p><b>{{address}}<br>PROJECT: #1507</b></p>
+				</div>
+				<p>We submit in attachment, for your review, a complete set of electrical plans, and load calculations for the above project.<br><br>The following is the project general information and load calculation:</p>
+				<ol>
+					<li>This is {{building}} project comprised of:</li>
+						<ul>
+							<li>{{apt_units}} Units</li>
+							<li>{{details}}</li>
+						</ul>
+					<li>Power loads calculation (demand load):
+						<ul>
+							<li>Area Load: {{area_load()}}KW</li>
+							<li ng-show="{{heating>cooling}}">Heating Loads (Larger than A/C loads): {{heating}}KW</li>
+							<li ng-show="{{heating<cooling}}">A/C Loads (Larger than heating loads): {{cooling}}KW</li>
+							<li ng-show="range">Range Load: {{range_power}}KW</li>
+							<li>Seperate Electric Vehicle Loads: {{electric_vehicle}}KW</li>
+							<li>Electric tankless water heaters, electric water heaters for steamers, swimming pools, hot tubs, spas Load: {{water_heater}}KW</li>
+							<li>Additional Loads: {{additional}}KW</li>
+							<li>External Electrical Vehicle Loads:<br>{{space_units}} units x {{space_load}}kW = {{space_units*space_load}}</li>
+							<li>External Loads: {{external_power}}KW</li>
+						</ul>
+					</li>
+					<li>Calculated Service:<br>power for entire Townhouse: {{apt_load | number:1}}kW<br>current for entire Townhouse: {{apt_amp | number:1}}A</li>
+					<li>Design Service:</li>
+					<br>
+				</ol>
+				<p>Yours truly,<br><br><b>JRL Engineering</b></p>
+				<img height="100px" src="https://lh3.googleusercontent.com/xMtSaZUNgb16rAOyGJ3ce-cN4UozLL1Ti1dsJbe6Spm9FzyIe_3i-L0ZMpgaM1DOYh0-K0vmaAUvu9y-WUTDae4JeNcX4VsgyK6MZuJ0vtZlpgR-4SzWLlkLARAm7BR0xlBEoHRU9YSItDPiWkoEdJ3XU1TtSSq_BpbZ7epNmdp2mffYduoFCs3mfNcNSPFDXtpOWelUo_Fl7ewScJUW7tun-bcz9P4Pz_Ob8Lfxb1QFxgQ0xZBjzZDBbI0uunWsQ7ycjcGMxBD_Dep2CLUWS16D4LN-bJkyZdlPSWIsdcX6qYzHH0oOXwQKkJGMh0AWZymbMZ4eC0fNjPBAsdlJn7MCYqr8rs5VJNhDTriG4XW5xG0a0EzC6xc_39bb_jPNnuuOfuFOpKldIhcIPF1MQK8Zz3Tl4bub46Asqe-KylgvPTukz0ygmxmcjFGvmabFoxtM8UqPbuRWj_IOFXhQFR5-RxFqEhBrgYTwjl_wUsWXz0XJqyUhzsvSdhWsqgijIXIivYzZDorqv7Z8sEqmEhnCH-U7JQC2XCqkFQMwysVBLiAYQpDBhQzBmDpt8-iZsgHCNPmPiBGrEkhEIE9U2MYsPOOLJOXIr2BqfJKAGxn7OcAbMiHtvZNBcD5VdrH8m-Zt6nr-bwyMQslOATeJA1uq18dgPBHJgUKDXkcFLR-79wCJjDCRrIxTYnIT=w313-h165-no?authuser=0">
+				<p>Jian Min Li, P. Eng.</p>
+				<footer>
+					<p>131 Cooperage Cres. Richmond Hill, ON, L4C 9L8	Tel: 647-537-6299 E-mail: jianminli2015@gmail.com</p>
+				</footer>
+			</div>
+
+	    </div>
+	</body>
+
+	<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/angular_material/1.1.12/angular-material.min.css">
+
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui/0.4.0/angular-ui.js"></script>
+
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.6/angular-animate.min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.6/angular-aria.min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.6/angular-messages.min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular-route.js"></script>
+
+	<link href="components/ngPrint/ngPrint.css">
+	<script src="components/ngPrint/ngPrint.js"></script>
+
+	<script src="https://ajax.googleapis.com/ajax/libs/angular_material/1.1.12/angular-material.min.js"></script>
+	<script src="app.js"></script>
+	<link rel="stylesheet" href="styles.css">
+	<script type="text/javascript">
+    function printlayer(layer){
+        var generator=window.open(",'name,");
+        var layetext= document.getElementById(layer);
+        generator.document.write(layetext.innerHTML.replace("print Me"));
+
+        generator.document.close();
+        generator.print();
+        generator.close();
+    }
+
+	// function PrintDiv(layer) 
+ //   {  
+ //       var divContents = document.getElementById(layer).innerHTML;  
+ //       var printWindow = window.open('', '', 'height=200,width=400');  
+ //       printWindow.document.write('<html><head><title>Print DIV Content</title>');  
+ //       printWindow.document.write('</head><body >');  
+ //       printWindow.document.write(divContents);  
+ //       printWindow.document.write('</body></html>');  
+ //       printWindow.document.close();  
+ //       printWindow.print();  
+ //    } 
+
+ //    function exportHTML(element){
+ //       var header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' "+
+ //            "xmlns:w='urn:schemas-microsoft-com:office:word' "+
+ //            "xmlns='http://www.w3.org/TR/REC-html40'>"+
+ //            "<head><meta charset='utf-8'><title>Export HTML to Word Document with JavaScript</title></head><body>";
+ //       var footer = "</body></html>";
+ //       var sourceHTML = header+document.getElementById(element).innerHTML+footer;
+       
+ //       var source = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(sourceHTML);
+ //       var fileDownload = document.createElement("a");
+ //       document.body.appendChild(fileDownload);
+ //       fileDownload.href = source;
+ //       fileDownload.download = 'document.doc';
+ //       fileDownload.click();
+ //       document.body.removeChild(fileDownload);
+ //    }
+	</script>
 </html>
